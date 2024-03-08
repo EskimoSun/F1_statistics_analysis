@@ -389,7 +389,10 @@
                 .on("mouseover", handleLapsLineMouseOver)
                 .on("mouseout", () => handleLineMouseOut(yearLegend));
                 });
+<<<<<<< HEAD
+=======
                 
+>>>>>>> 601e81baf436ae78a983dec45ff84b090a80169a
         }
     });
 </script>

@@ -217,7 +217,11 @@
         .join("path")
         .attr("class", "line year-line") // Add class 'year-line'
         .attr("fill", "none")
+<<<<<<< HEAD
+        .attr("stroke", d => getDriverColor(selectedYear, d[0])) 
+=======
         .attr("stroke", d => getDriverColor(selectedYear, d[0]))
+>>>>>>> 601e81baf436ae78a983dec45ff84b090a80169a
         .attr("stroke-width", 2)
         .attr("d", d => d3.line()
           .x(d => x(d.round))
@@ -241,10 +245,18 @@
           .on("mouseover", handleLineMouseOver)
           .on("mouseout", () => handleLineMouseOut(yearLegend)); // Pass legend as a parameter
         });
+<<<<<<< HEAD
+
+    }
+  });
+
+
+=======
   
     }
   });
 
+>>>>>>> 601e81baf436ae78a983dec45ff84b090a80169a
 </script>
 
 <!-- The container for the chart -->
