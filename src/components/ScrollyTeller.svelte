@@ -3,6 +3,9 @@
   import EachYear from "./EachYear.svelte";
   import LaptimeDiff from "./LaptimeDiff.svelte";
   import Silverstone from "./Silverstone.svelte";
+  import DriverCareer from "./DriverCareer.svelte";
+  import DriverWin from "./DriverWinningYear.svelte";
+  import DriverDom from "./DriverDominant.svelte";
   let count, index, offset, progress;
   let width, height;
 </script>
@@ -31,12 +34,27 @@
 
   <div class="foreground" slot="foreground">
     <section class="title">
-      <span class="title">Is Verstappen More Dominant Than Schumacher?</span>
+      <span class="title">Is Hamilton More Dominant Than Schumacher?</span>
       <div>
         <span>Battle for the GOAT</span>
         <p>A comparison of race statistics for the two Formula 1 World Champions</p>
         <Silverstone />
       </div>
+    </section>
+    <section>
+      <p class="chart-title main-title">Career Stats</p>
+      <p class="chart-title subtitle">Michael Schumacher vs Lewis Hamilton</p>
+      <DriverCareer {index} {width} {height}/>
+    </section>
+    <section>
+      <p class="chart-title main-title">Championship Winning Years</p>
+      <p class="chart-title subtitle">Michael Schumacher vs Lewis Hamilton</p>
+      <DriverWin {index} {width} {height}/>
+    </section>
+    <section>
+      <p class="chart-title main-title">Dominant Season (MSC: 2004, HAM: 2019)</p>
+      <p class="chart-title subtitle">Michael Schumacher vs Lewis Hamilton</p>
+      <DriverDom {index} {width} {height}/>
     </section>
     <section>
       <p class="chart-title">Total Points From Each Driver By Season</p>
@@ -70,8 +88,7 @@
     margin: 0 auto;
     height: auto;
     position: relative;
-    outline: grey solid 3px;
-    background-color: #1D2B53;
+    background-color: #0D1B43;
   }
 
   .progress-bars {
@@ -83,7 +100,7 @@
     height: 100vh;
     background-color: rgba(255, 0, 0, 0.05); /* 20% opaque */
     /* color: white; */
-    outline: grey solid 3px;
+    outline: grey solid 1px;
     text-align: center;
     max-width: 1500px; /* adjust at will */
     color: #FAEF5D;
@@ -98,6 +115,17 @@
   section.title{
     height: 50vh;
     font-size: 25px;
+  }
+  .chart-title {
+    font-size: 18px;
+  }
+
+  .main-title {
+      font-weight: bold;
+  }
+
+  .subtitle {
+      font-size: 14px;
   }
   section.writeup{
     padding-left: 40px;
