@@ -140,7 +140,7 @@
         resetLegendText(lapsSvg, yearLegend);
     }
 
-    onMount(() => {
+    onMount(async () => {
         const margin = { top: 50, right: 30, bottom: 10, left: 60 },
             widthLapsChart = width - margin.left - margin.right,
             heightLapsChart = height * 0.75 - margin.top - margin.bottom;
@@ -152,66 +152,68 @@
             .append("g")
             .attr("transform", `translate(${margin.left},${margin.top})`);
 
-        d3.json("src/data/laps_data.json").then(function (loadedLapsData) {
-            lapsData = loadedLapsData;
-            d3.csv("src/data/dataset.csv").then(function (loadedData) {
-                data = loadedData;
-                // Populate the rounds dropdown based on the selected year
-                const roundDropdown = select("#round_dropdown");
-                const rounds = Object.keys(
-                    lapsData[selectedYear.toString()] || {},
-                );
-                roundDropdown
-                    .selectAll("option")
-                    .data(rounds)
-                    .enter()
-                    .append("option")
-                    .text((d) => d)
-                    .attr("value", (d) => d);
-                roundDropdown.property("value", selectedRound);
-                // Populate the year dropdown
+        // Fetch and load data
+        const race_info_csv = await fetch("dataset.csv");
+        const laps_csv = await fetch("laps_data.json");
+        const race_info_text = await race_info_csv.text();
+        const laps_text = await laps_csv.text();
+        data = d3.csvParse(race_info_text, d3.autoType);
+        lapsData = JSON.parse(laps_text);
 
-                const lapsYearDropdown = select("#laps_year_dropdown");
-                lapsYearDropdown
-                    .selectAll("option")
-                    .data(allYears)
-                    .enter()
-                    .append("option")
-                    .text((d) => d)
-                    .attr("value", (d) => d);
-                lapsYearDropdown.property("value", selectedYear);
+        // Populate the rounds dropdown based on the selected year
+        const roundDropdown = select("#round_dropdown");
+        const rounds = Object.keys(
+            lapsData[selectedYear.toString()] || {},
+        );
+        roundDropdown
+            .selectAll("option")
+            .data(rounds)
+            .enter()
+            .append("option")
+            .text((d) => d)
+            .attr("value", (d) => d);
+        roundDropdown.property("value", selectedRound);
+        // Populate the year dropdown
 
-                // Listens to changes in selection
-                roundDropdown.on("change", function () {
-                    selectedRound = +this.value;
-                    setDriverColors(selectedYear); // Set colors for drivers in the selected year
-                    updateChart(selectedYear, selectedRound);
-                });
-                // Listens to changes in selection
-                lapsYearDropdown.on("change", function () {
-                    selectedYear = +this.value;
-                    updateRoundsDropdown(selectedYear);
-                    setDriverColors(selectedYear); // Set colors for drivers in the selected year
-                    updateChart(selectedYear, selectedRound);
-                });
+        const lapsYearDropdown = select("#laps_year_dropdown");
+        lapsYearDropdown
+            .selectAll("option")
+            .data(allYears)
+            .enter()
+            .append("option")
+            .text((d) => d)
+            .attr("value", (d) => d);
+        lapsYearDropdown.property("value", selectedYear);
 
-                function updateRoundsDropdown(year) {
-                    roundDropdown.selectAll("option").remove();
-                    const rounds = Object.keys(lapsData[year.toString()] || {});
-                    roundDropdown
-                        .selectAll("option")
-                        .data(rounds)
-                        .enter()
-                        .append("option")
-                        .text((d) => d)
-                        .attr("value", (d) => d);
-                }
-
-                // Initialize chart
-                setDriverColors(selectedYear);
-                updateChart(selectedYear, selectedRound);
-            });
+        // Listens to changes in selection
+        roundDropdown.on("change", function () {
+            selectedRound = +this.value;
+            setDriverColors(selectedYear); // Set colors for drivers in the selected year
+            updateChart(selectedYear, selectedRound);
         });
+        // Listens to changes in selection
+        lapsYearDropdown.on("change", function () {
+            selectedYear = +this.value;
+            updateRoundsDropdown(selectedYear);
+            setDriverColors(selectedYear); // Set colors for drivers in the selected year
+            updateChart(selectedYear, selectedRound);
+        });
+
+        function updateRoundsDropdown(year) {
+            roundDropdown.selectAll("option").remove();
+            const rounds = Object.keys(lapsData[year.toString()] || {});
+            roundDropdown
+                .selectAll("option")
+                .data(rounds)
+                .enter()
+                .append("option")
+                .text((d) => d)
+                .attr("value", (d) => d);
+        }
+
+        // Initialize chart
+        setDriverColors(selectedYear);
+        updateChart(selectedYear, selectedRound);
 
         function updateChart(selectedYear, selectedRound) {
             lapsSvg.selectAll("*").remove();
@@ -313,7 +315,7 @@
                 .style("cursor", "pointer")
                 .on("mouseover", handleLegendMouseOver)
                 .on("mouseout", handleLegendMouseOut);
-
+            
             // Legend Texts
             yearLegend
                 .selectAll("text")
@@ -325,7 +327,7 @@
                 .style("text-anchor", "middle")
                 .text(
                     (d) =>
-                        data.find((entry) => entry.driverId === d)?.code || "",
+                        data.find((entry) => entry.driverId == d)?.code || "",
                 )
                 .style("cursor", "pointer")
                 .style("font-size", "8px")
@@ -389,10 +391,6 @@
                 .on("mouseover", handleLapsLineMouseOver)
                 .on("mouseout", () => handleLineMouseOut(yearLegend));
                 });
-<<<<<<< HEAD
-=======
-                
->>>>>>> 601e81baf436ae78a983dec45ff84b090a80169a
         }
     });
 </script>

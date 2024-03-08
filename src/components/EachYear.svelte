@@ -98,7 +98,7 @@
   }
 
 
-  onMount(() => {
+  onMount(async () => {
     const margin = { top: 10, right: 30, bottom: 30, left: 60 },
     widthPtsChart = width - margin.left - margin.right,
     heightPtsChart = height * 0.75 - margin.top - margin.bottom;
@@ -109,28 +109,29 @@
       .attr("height", height)
       .append("g")
       .attr("transform", `translate(${margin.left},${margin.top})`);
+    
+      // Fetch and load data
+    const race_info_csv = await fetch("dataset.csv");
+    const race_info_text = await race_info_csv.text();
+    data = d3.csvParse(race_info_text, d3.autoType);
 
-    d3.csv("src/data/dataset.csv").then(function (loadedData) {
-      data = loadedData;
+    // Populate the year dropdown
+    const yearDropdown = select("#year_dropdown");
+      yearDropdown.selectAll('option')
+        .data(allYears)
+        .enter()
+        .append('option')
+        .text(d => d)
+        .attr("value", d => d);
+    yearDropdown.property("value", selectedYear);
 
-      // Populate the year dropdown
-      const yearDropdown = select("#year_dropdown");
-        yearDropdown.selectAll('option')
-          .data(allYears)
-          .enter()
-          .append('option')
-          .text(d => d)
-          .attr("value", d => d);
-      yearDropdown.property("value", selectedYear);
-
-      yearDropdown.on("change", function () {
-        selectedYear = +this.value;
-        setDriverColors(selectedYear); // Set colors for drivers in the selected year
-        updateChart(selectedYear, selectedRound);
-      });
-      setDriverColors(selectedYear);
-      updateChart(selectedYear);
+    yearDropdown.on("change", function () {
+      selectedYear = +this.value;
+      setDriverColors(selectedYear); // Set colors for drivers in the selected year
+      updateChart(selectedYear, selectedRound);
     });
+    setDriverColors(selectedYear);
+    updateChart(selectedYear);
 
     function updateChart(selectedYear) {
       svg.selectAll("*").remove();
@@ -217,11 +218,7 @@
         .join("path")
         .attr("class", "line year-line") // Add class 'year-line'
         .attr("fill", "none")
-<<<<<<< HEAD
         .attr("stroke", d => getDriverColor(selectedYear, d[0])) 
-=======
-        .attr("stroke", d => getDriverColor(selectedYear, d[0]))
->>>>>>> 601e81baf436ae78a983dec45ff84b090a80169a
         .attr("stroke-width", 2)
         .attr("d", d => d3.line()
           .x(d => x(d.round))
@@ -245,18 +242,10 @@
           .on("mouseover", handleLineMouseOver)
           .on("mouseout", () => handleLineMouseOut(yearLegend)); // Pass legend as a parameter
         });
-<<<<<<< HEAD
 
     }
   });
 
-
-=======
-  
-    }
-  });
-
->>>>>>> 601e81baf436ae78a983dec45ff84b090a80169a
 </script>
 
 <!-- The container for the chart -->
