@@ -19,6 +19,14 @@
         { poles: 'Poles Count', ham: 5, sch: 8 }
     ];
 
+    const total_dom_stats = [
+        { total_point: 'Maximum Points', ham: 546, sch: 180 },
+        { total_race: 'Total Races', ham: 21, sch: 18 },
+        { total_race: 'Total Races', ham: 21, sch: 18 },
+        { total_race: 'Total Races', ham: 21, sch: 18 },
+        { total_race: 'Total Races', ham: 21, sch: 18 }
+    ];
+
     let container;
     let svg;
     let isVisible;
@@ -27,7 +35,7 @@
     let bar1;
     let bar2;
     let xScale;
-    const barHeight = 50;
+    const barHeight =35;
 
     $:if(index == 3){
         isVisible = true;
@@ -43,87 +51,90 @@
 
     function toggleVisibility(makeVisible) {
         if (makeVisible) {
+            // Reset initial state
+            bar1.attr('x', xScale(0)+70)
+                .attr('width', 0);
+
+            bar2.attr('x', xScale(0)-70)
+                .attr('width', 0);
+
             // Animate to visible state
             bar1.transition()
                 .duration(1000) // Duration of the transition
                 .attr('width', d => Math.abs(xScale(d.ham) - xScale(0))) // Animate to final width
-                .on('end', function() { // Once the transition is complete, attach event listeners
+                .on('end', function () { // Once the transition is complete, attach event listeners
                     d3.select(this)
-                    .on('mouseover', (event, d) => handleBarMouseOver(event, d, 'ham'))
-                    .on('mouseout', (event, d) => handleBarMouseOut(event, d, 'ham'));
+                        .on('mouseover', (event, d) => handleBarMouseOver(event, d, 'ham'))
+                        .on('mouseout', (event, d) => handleBarMouseOut(event, d, 'ham'));
                 });
+
             bar2.transition()
                 .duration(1000) // Duration of the transition
+                .attr('x', d => xScale(0) - Math.abs(xScale(-d.sch) - xScale(0)) -70) // Move bar2 to the left
                 .attr('width', d => Math.abs(xScale(-d.sch) - xScale(0))) // Animate to final width
-                .on('end', function() { // Once the transition is complete, attach event listeners
+                .on('end', function () { // Once the transition is complete, attach event listeners
                     d3.select(this)
-                    .on('mouseover', (event, d) => handleBarMouseOver(event, d, 'sch'))
-                    .on('mouseout', (event, d) => handleBarMouseOut(event, d, 'sch'));
+                        .on('mouseover', (event, d) => handleBarMouseOver(event, d, 'sch'))
+                        .on('mouseout', (event, d) => handleBarMouseOut(event, d, 'sch'));
                 });
         } else {
             // Animate back to width 0
             bar1.transition()
                 .duration(1000) // Duration of the transition
                 .attr('width', 0)
-                .on('start', function() { // Before starting the hide transition, remove event listeners
+                .on('end', function () { // Once the transition is complete, remove event listeners
                     d3.select(this).on('mouseover', null).on('mouseout', null);
                 });
+
             bar2.transition()
                 .duration(1000) // Duration of the transition
+                .attr('x', xScale(0) - 70) // Move bar2 back to the center
                 .attr('width', 0)
-                .on('start', function() { // Before starting the hide transition, remove event listeners
+                .on('end', function () { // Once the transition is complete, remove event listeners
                     d3.select(this).on('mouseover', null).on('mouseout', null);
                 });
         }
+
     }
 
     function handleBarMouseOver(event, d, key) {
+        // Create a group for the bar and text
+        const group = svg.append('g').attr('class', 'bar-group');
+
         // Highlight the hovered bar
-        const currentBar = d3.select(event.currentTarget);
-        currentBar.attr('fill', 'orange');
+        const currentBar = group.append('rect')
+            .attr('x', +event.currentTarget.getAttribute('x'))
+            .attr('y', +event.currentTarget.getAttribute('y'))
+            .attr('width', +event.currentTarget.getAttribute('width'))
+            .attr('height', +event.currentTarget.getAttribute('height'))
+            .attr('fill', 'orange');
 
-        // Show a tooltip with information
-        tooltip.transition()
-            .duration(200)
-            .style('opacity', 0.9);
-
-        const barValue = Object.values(d)[0];
-
-        tooltip.html(`${barValue}: ${d3.format(".2f")(d[key])}%`)
-            .style('left', (event.pageX + 10) + 'px')
-            .style('top', (event.pageY - 28) + 'px');
-
-        // Add text inside the highlighted bar
-        svg.append('text')
+        // Add text to the group
+        group.append('text')
             .attr('class', 'highlighted-text')
-            .attr('x', +currentBar.attr('x') + +currentBar.attr('width') / 2) // Convert to numbers
-            .attr('y', +currentBar.attr('y') + barHeight / 2) // Convert to numbers
+            .attr('x', +currentBar.attr('x') + +currentBar.attr('width') / 2)
+            .attr('y', +currentBar.attr('y') + barHeight / 2)
             .attr('dy', '.35em')
             .attr('text-anchor', 'middle')
-            .attr('fill', 'black')  // Adjust the text color as needed
+            .attr('fill', 'black')
             .text(`${d3.format(".2f")(d[key])}%`);
     }
 
     function handleBarMouseOut(event, d, key) {
-        // Reset the color of the bar to the original colors
-        const currentBar = d3.select(event.currentTarget);
-        const originalColor = key === 'ham' ? '#5CA4FF' : '#8CC84B';
-        currentBar.attr('fill', originalColor);
-
-        // Hide the tooltip
-        tooltip.transition()
-            .duration(500)
-            .style('opacity', 0);
-
-        // Remove the highlighted text when mouse out
-        svg.selectAll('.highlighted-text').remove();
+        // Delay the removal of the group containing the bar and text
+        setTimeout(() => {
+            // Remove the group containing the bar and text
+            svg.selectAll('.bar-group').remove();
+        }, 100); // Adjust the delay time as needed
     }
 
     onMount(() => {
-        const margin = { top: 20, right: 20, bottom: 20, left: 20 };
-        const widthPlsChart = width * 0.95 - margin.left - margin.right;
-        const heightPlsChart = height * 0.75 - margin.top - margin.bottom;
-        const extraPadding = 50; // Adjust as needed
+        const svgWidth = width * 0.75;
+        const svgHeight = height * 0.7;
+        const margin = { top: 10, right: 20, bottom: 10, left: 10 };
+        const widthPlsChart = svgWidth - margin.left - margin.right;
+        const heightPlsChart = svgHeight * 0.75 - margin.top - margin.bottom;
+        const extraPadding = 70; 
         // Select the container div after the component is mounted
         container = d3.select('#chart-container-3');
 
@@ -170,22 +181,47 @@
             .data(per_dom_stats)
             .enter().append('text')
             .attr('class', 'label1')
-            .attr('x', widthPlsChart - 30)
-            .attr('y', (d, i) => yScale(Object.keys(d)[0]) + barHeight / 2)
+            .attr('x', widthPlsChart - 10)
+            .attr('y', (d, i) => yScale(Object.keys(d)[0]) + 7)
             .attr('dy', '.35em')
             .attr('fill', "#FAEF5D")
             .attr('cursor', 'pointer')
             .attr('text-anchor', 'end')
             .each(function (d, i) {
                 const label = d3.select(this);
+                const xPosition = widthPlsChart - 10; 
                 if (Object.values(per_dom_stats[i])[1] >= Object.values(per_dom_stats[i])[2]) {
                     label.append('tspan')
-                        .html('<tspan>&#x1F3C6;</tspan>') // Unicode for the trophy symbol
-                        .append('tspan')
-                        .text(` ${Object.values(dom_stats[i])[0]}: ${Object.values(dom_stats[i])[1]}`);
+                        .attr('x', xPosition) // Set the x position
+                        .text(` ${Object.values(dom_stats[i])[0]}: ${Object.values(dom_stats[i])[1]}`)
+                        .attr('fill', '#ff9729')
+                        .style('font-weight', 'bold');
+                        
+                    label.append('tspan')
+                        .attr('x', xPosition + 30)
+                        .attr('dy', '1em')
+                        .html('<tspan>&#x1F3C6;</tspan>');
+            
+                    label.append('tspan')
+                        .attr('x', xPosition) // Set the x position
+                        .attr('dy', '0.5em') // Adjust the y-coordinate for the second line
+                        .text(` ${Object.values(total_dom_stats[i])[0]}: ${Object.values(total_dom_stats[i])[1]}`)
+                        .attr('fill', '#ff9729')
+                        .style('font-size', 'smaller');
+
                 } else {
                     label.append('tspan')
-                        .text(` ${Object.values(dom_stats[i])[0]}: ${Object.values(dom_stats[i])[1]}`);
+                        .attr('x', xPosition)
+                        .text(` ${Object.values(dom_stats[i])[0]}: ${Object.values(dom_stats[i])[1]}`)
+                        .attr('fill', '#5CA4FF')
+                        .style('font-weight', 'bold');
+
+                    label.append('tspan')
+                        .attr('x', xPosition)
+                        .attr('dy', '1.8em') // Adjust the y-coordinate for the second line
+                        .text(` ${Object.values(total_dom_stats[i])[0]}: ${Object.values(total_dom_stats[i])[1]}`)
+                        .attr('fill', '#5CA4FF')
+                        .style('font-size', 'smaller');
                 }
             });
 
@@ -219,32 +255,59 @@
             .enter().append('text')
             .attr('class', 'label2')
             .attr('x', margin.left + 30)
-            .attr('y', (d, i) => yScale(Object.keys(d)[0]) + barHeight / 2)
+            .attr('y', (d, i) => yScale(Object.keys(d)[0]) + barHeight / 2 - 13)
             .attr('dy', '.35em')
             .attr('fill', "#FAEF5D")
             .attr('cursor', 'pointer')
             .each(function (d, i) {
                 const label = d3.select(this);
+                const xPosition = margin.left + 30; 
                 if (Object.values(per_dom_stats[i])[2] >= Object.values(per_dom_stats[i])[1]) {
                     label.append('tspan')
-                        .html('<tspan>&#x1F3C6;</tspan>') // Unicode for the trophy symbol
-                        .append('tspan')
-                        .text(` ${Object.values(dom_stats[i])[0]}: ${Object.values(dom_stats[i])[2]}`);
+                        .attr('x', xPosition) // Set the x position
+                        .text(` ${Object.values(dom_stats[i])[0]}: ${Object.values(dom_stats[i])[2]}`)
+                        .attr('fill', '#ff9729')
+                        .style('font-weight', 'bold');
+                        
+                    label.append('tspan')
+                        .attr('x', xPosition - 30)
+                        .attr('dy', '1em')
+                        .html('<tspan>&#x1F3C6;</tspan>');
+            
+                    label.append('tspan')
+                        .attr('x', xPosition) // Set the x position
+                        .attr('dy', '0.5em') // Adjust the y-coordinate for the second line
+                        .text(` ${Object.values(total_dom_stats[i])[0]}: ${Object.values(total_dom_stats[i])[2]}`)
+                        .attr('fill', '#ff9729')
+                        .style('font-size', 'smaller');
+
                 } else {
                     label.append('tspan')
-                        .text(` ${Object.values(dom_stats[i])[0]}: ${Object.values(dom_stats[i])[2]}`);
+                        .attr('x', xPosition)
+                        .text(` ${Object.values(dom_stats[i])[0]}: ${Object.values(dom_stats[i])[2]}`)
+                        .attr('fill', '#8CC84B')
+                        .style('font-weight', 'bold');
+
+                    label.append('tspan')
+                        .attr('x', xPosition)
+                        .attr('dy', '1.8em') // Adjust the y-coordinate for the second line
+                        .attr('fill', '#8CC84B')
+                        .text(` ${Object.values(total_dom_stats[i])[0]}: ${Object.values(total_dom_stats[i])[2]}`)
+                        .style('font-size', 'smaller');
                 }
             });
     
         const scaleRight = d3.scaleLinear()
             .domain([maxDataValue + extraPadding, 0])
-            .range([-spaceBetweenBars * 2, widthPlsChart/2 - spaceBetweenBars]);
+            .range([-spaceBetweenBars * 2 + margin.left * 2, widthPlsChart/2 - spaceBetweenBars]);
 
         const xAxis1 = svg.append('g')
             .attr('class', 'x-axis')
-            .attr('transform', 'translate(0,' + (barHeight + 500) + ')')
-            .call(d3.axisTop(scaleRight).tickValues([20, 40, 60, 80])
-            .tickFormat(d => (d <= 100) ? (d + '%') : null)); // Format ticks and hide those greater than 100
+            .attr('transform', 'translate(0,' + (barHeight + 360) + ')')
+            .call(d3.axisTop(scaleRight).tickValues([0, 20, 40, 60, 80])
+            .tickFormat(d => (d <= 100) ? (d + '%') : null))
+            .selectAll('text')  // Select all tick text elements
+            .attr('dx', '0.5em'); 
 
         // Customize the tick labels appearance
         xAxis1.selectAll('text')
@@ -254,13 +317,15 @@
 
         const scaleLeft = d3.scaleLinear()
             .domain([0, maxDataValue + extraPadding])
-            .range([widthPlsChart / 2 + spaceBetweenBars, widthPlsChart + spaceBetweenBars]);
+            .range([widthPlsChart / 2 + spaceBetweenBars, widthPlsChart+ 2*spaceBetweenBars - margin.right * 2]);
 
         const xAxis2 = svg.append('g')
             .attr('class', 'x-axis')
-            .attr('transform', 'translate(0,' + (barHeight + 500) + ')')
-            .call(d3.axisTop(scaleLeft).tickValues([20, 40, 60, 80])
-            .tickFormat(d => (d <= 100) ? (d + '%') : null)); // Format ticks and hide those greater than 100
+            .attr('transform', 'translate(0,' + (barHeight + 360) + ')')
+            .call(d3.axisTop(scaleLeft).tickValues([0, 20, 40, 60, 80])
+            .tickFormat(d => (d <= 100) ? (d + '%') : null))
+            .selectAll('text')  // Select all tick text elements
+            .attr('dx', '0.5em'); 
 
         // Customize the tick labels appearance
         xAxis2.selectAll('text')
