@@ -41,7 +41,8 @@
       </div>
       <div class="route">
       </div>
-      <img src="./src/components/photo2.png" alt="Comparison Photo" width="900" height="500"/>
+      <!-- svelte-ignore a11y-img-redundant-alt -->
+      <img src="https://raw.githubusercontent.com/EskimoSun/F1_statistics_analysis/main/assets/photo2.png" alt="Comparison Photo" width="900" height="500"/>
     </section>
     <section>
       <p class="chart-title main-title">Career Stats</p>
