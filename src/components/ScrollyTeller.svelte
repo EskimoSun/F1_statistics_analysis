@@ -63,7 +63,7 @@
       <Timeline/>
     </section>
 
-    <section style="height:105vh">
+    <section style="height:auto">
       <p class="chart-title">Career Stats</p>
       <p style="font-size: 22px;">What is Hamilton and Schumacher Overall Career Achievements?</p>
       <div class="bottom-section">
@@ -88,9 +88,10 @@
           </div>
         </div>
       </div>
+      <br>
     </section>
 
-    <section style="height:107vh">
+    <section style="height:auto">
       <p class="chart-title">Championship Winning Season</p>
       <p style="font-size: 18px;padding: 0px 80px;text-align: left">Sometimes looking at the overall career achievements doesn't tell the full story. Both drivers had mediocre seasons when their team's car simply lacked the speed to rank at the front of the grid. Luckily, both drivers had 7 phenomenal seasons when they had won the championship. Lets evaluate the drivers' performance at their prime!</p>
       <div class="bottom-section">
@@ -102,7 +103,6 @@
           <p style="text-align: left; font-size: 18px;">Schumacher's lead in <span style="color: #ff9729; font-weight: bold; font-size: 22px">fastest laps</span> and <span style="color: #ff9729; font-weight: bold; font-size: 22px">race wins</span> imply a <span style="color: #ff9729; font-weight: bold; font-size: 22px">quicker race pace</span> than Lewis Hamilton.</p>
           <br>
           <p style="text-align: left; font-size: 18px;">Hamilton's <span style="color: #ff9729; font-weight: bold; font-size: 22px">lower pole-to-win</span> conversion implies that the pace of the car might have helped him get more poles, but he couldn't continue the pace in the race.</p>
-
           <p style="text-align: left; font-size: 15px;">Schumacher's winning Season: 1994, 1995, 2000, 2001, 2002, 2003, 2004</p>
           <p style="text-align: left; font-size: 15px;">Hamilton's winning Season: 2008, 2014, 2015, 2017, 2018, 2019, 2020</p>
         </div>
@@ -116,9 +116,10 @@
           </div>
         </div>
       </div>
+      <br>
     </section>
 
-    <section style="height:120vh;">
+    <section style="height:auto;">
       <p class="chart-title">Most Dominant Season (MSC: 2004, HAM: 2020)</p>
       <p style="font-size: 20px;">What if we narrow down even further and compare their absolute peak dominance?</p>
       <div class="bottom-section">
@@ -131,7 +132,6 @@
           <br>
           <br>
           <p style="text-align: left; font-size: 18px;">But the details on whichever driver is the greater driver is ambiguous. Discussed in our additional information, many factors such as points system, strategy, and tyre plays such an effect on the statistics of the driver that by simply looking at the numbers <span style="color: #ff9729; font-weight: bold; font-size: 22px"> couldn't be conclusive. </span></p>
-          <br>
         </div>
         <div class="bottom-right">
           <p class="chart-title subtitle">
@@ -143,7 +143,7 @@
           </div>
         </div>
       </div>
-      <p style="text-align: left; font-size: 18px; margin: 50px 70px 20px 50px"><span style="color: #ff9729; font-weight: bold; font-size: 22px">Therefore</span>,  one simple glance at the statistics of any two sports champion doesn't tell who is the greater player. You would have to look at the implications behind specific characteristics within their own time frames like we have shown in our bar chart, and discover why they are great in their own way.</p>
+      <p style="text-align: left; font-size: 18px; margin: 40px 50px 20px 50px"><span style="color: #ff9729; font-weight: bold; font-size: 22px">Therefore</span>,  one simple glance at the statistics of any two sports champion doesn't tell who is the greater player. You would have to look at the implications behind specific characteristics within their own time frames like we have shown in our bar chart, and discover why they are great in their own way.</p>
       <p style="text-align: center; font-size: 18px; font-weight:bold;">Continue below and see how your favorite driver stacks up against Schumacher and Hamilton!</p>
     </section>
 

@@ -205,6 +205,7 @@
                     label.append('tspan')
                         .attr('x', xPosition) // Set the x position
                         .text(` ${Object.values(win_stats[i])[0]}: ${Object.values(win_stats[i])[1]}`)
+                        .style('text-shadow', '1px 1px 0.5px #0D1B43')
                         .attr('fill', '#ff9729')
                         .style('font-weight', 'bold');
                         
@@ -217,6 +218,7 @@
                         .attr('x', xPosition) // Set the x position
                         .attr('dy', '0.5em') // Adjust the y-coordinate for the second line
                         .text(` ${Object.values(total_win_stats[i])[0]}: ${Object.values(total_win_stats[i])[1]}`)
+                        .style('text-shadow', '1px 1px 0.5px #0D1B43')
                         .attr('fill', '#ff9729')
                         .style('font-size', 'smaller');
 
@@ -224,6 +226,7 @@
                     label.append('tspan')
                         .attr('x', xPosition)
                         .text(` ${Object.values(win_stats[i])[0]}: ${Object.values(win_stats[i])[1]}`)
+                        .style('text-shadow', '1px 1px 0.5px #0D1B43')
                         .attr('fill', '#5CA4FF')
                         .style('font-weight', 'bold');
 
@@ -231,6 +234,7 @@
                         .attr('x', xPosition)
                         .attr('dy', '1.8em') // Adjust the y-coordinate for the second line
                         .text(` ${Object.values(total_win_stats[i])[0]}: ${Object.values(total_win_stats[i])[1]}`)
+                        .style('text-shadow', '1px 1px 0.5px #0D1B43')
                         .attr('fill', '#5CA4FF')
                         .style('font-size', 'smaller');
                 }
@@ -277,6 +281,7 @@
                     label.append('tspan')
                         .attr('x', xPosition) // Set the x position
                         .text(` ${Object.values(win_stats[i])[0]}: ${Object.values(win_stats[i])[2]}`)
+                        .style('text-shadow', '1px 1px 0.5px #0D1B43')
                         .attr('fill', '#ff9729')
                         .style('font-weight', 'bold');
                         
@@ -289,6 +294,7 @@
                         .attr('x', xPosition) // Set the x position
                         .attr('dy', '0.5em') // Adjust the y-coordinate for the second line
                         .text(` ${Object.values(total_win_stats[i])[0]}: ${Object.values(total_win_stats[i])[2]}`)
+                        .style('text-shadow', '1px 1px 0.5px #0D1B43')
                         .attr('fill', '#ff9729')
                         .style('font-size', 'smaller');
 
@@ -296,6 +302,7 @@
                     label.append('tspan')
                         .attr('x', xPosition)
                         .text(` ${Object.values(win_stats[i])[0]}: ${Object.values(win_stats[i])[2]}`)
+                        .style('text-shadow', '1px 1px 0.5px #0D1B43')
                         .attr('fill', '#8CC84B')
                         .style('font-weight', 'bold');
 
@@ -304,6 +311,7 @@
                         .attr('dy', '1.8em') // Adjust the y-coordinate for the second line
                         .attr('fill', '#8CC84B')
                         .text(` ${Object.values(total_win_stats[i])[0]}: ${Object.values(total_win_stats[i])[2]}`)
+                        .style('text-shadow', '1px 1px 0.5px #0D1B43')
                         .style('font-size', 'smaller');
                 }
             });
