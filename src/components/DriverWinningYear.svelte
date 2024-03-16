@@ -11,6 +11,14 @@
         { percentage_poles: 'Poles', ham: parseFloat((0.459259259 * 100).toFixed(2)), sch: parseFloat((0.423728814 * 100).toFixed(2)) }
         ];
 
+    const stats_annotation = {
+        percentage_points: 'Other than the biased measures caused by the different points scoring systems, Schumacher has also had way more retired races than Hamilton, contributing to his lower points scored. Over each of their championship seasons, Michael Schumacher had accumulated 14 race DNFs (retired status), and 2 disqualifications, while Hamilton had only recieved a mere 6 DNFs over the span of 7 championship years. This demonstrates that Hamilton had a generally more reliable car than Schumacher, while Schumacher might have had a more aggressive driving style when compared to Hamilton.',
+        percentage_wins: "When we focus only on the 7 championship seasons, Michael's win rates had exceeded that of Lewis'. Most of these wins come from 2000-2004 seasons, when he was the leading driver at Ferrari. This fact reflects how dominant he and his team were at the height of their greatness. ",
+        percentage_fl: "Similar to the career stats comparison, Schumacher still has an edge over Hamilton in the percentage fastest laps attributed to his well-known race pace. Additionally, obtaining the fastest lap in a race at Schumacher's time was not rewarded with one championship point, so it was purely decided by the competitiveness of the race and the sheer pace he delivered.",
+        percentage_pod: "Both drivers had an unbelievable amount of podium finishes, showing that both of them are incredibly consistent across all types of race tracks. ",
+        percentage_poles: "As we focus down to 7 years, Schumacher's pole percentage has gone up 20% and Hamilton's has gone around 15%. The one-lap speed often is a showdown for the performance of the cars and how it stacks up against other team's cars. In their dominant eras, both drivers' cars were big contributing factors to their success. ",
+    }
+
     const win_stats = [
         { points: '#Points', ham: 2394, sch: 810 },
         { wins: '#Wins', ham: 68, sch: 65 },
@@ -37,7 +45,7 @@
     let xScale;
     const barHeight = 37;
 
-    $:if(index == 2){
+    $:if(index == 3){
         isVisible = true;
         if (allInitialized){
             toggleVisibility(isVisible);
@@ -65,7 +73,8 @@
                 .on('end', function () { // Once the transition is complete, attach event listeners
                     d3.select(this)
                         .on('mouseover', (event, d) => handleBarMouseOver(event, d, 'ham'))
-                        .on('mouseout', (event, d) => handleBarMouseOut(event, d, 'ham'));
+                        .on('mouseout', (event, d) => handleBarMouseOut(event, d, 'ham'))
+                        .on('click', (event, d) => handleBarMouseClick(event, d, 'ham'));
                 });
 
             bar2.transition()
@@ -75,7 +84,8 @@
                 .on('end', function () { // Once the transition is complete, attach event listeners
                     d3.select(this)
                         .on('mouseover', (event, d) => handleBarMouseOver(event, d, 'sch'))
-                        .on('mouseout', (event, d) => handleBarMouseOut(event, d, 'sch'));
+                        .on('mouseout', (event, d) => handleBarMouseOut(event, d, 'sch'))
+                        .on('click', (event, d) => handleBarMouseClick(event, d, 'sch'));
                 });
         } else {
             // Animate back to width 0
@@ -83,7 +93,7 @@
                 .duration(1000) // Duration of the transition
                 .attr('width', 0)
                 .on('end', function () { // Once the transition is complete, remove event listeners
-                    d3.select(this).on('mouseover', null).on('mouseout', null);
+                    d3.select(this).on('mouseover', null).on('mouseout', null).on('click', null);
                 });
 
             bar2.transition()
@@ -91,28 +101,18 @@
                 .attr('x', xScale(0) - 70) // Move bar2 back to the center
                 .attr('width', 0)
                 .on('end', function () { // Once the transition is complete, remove event listeners
-                    d3.select(this).on('mouseover', null).on('mouseout', null);
+                    d3.select(this).on('mouseover', null).on('mouseout', null).on('click', null);
                 });
         }
     }
 
     function handleBarMouseOver(event, d, key) {
-        // Create a group for the bar and text
-        const group = svg.append('g').attr('class', 'bar-group');
-
-        // Highlight the hovered bar
-        const currentBar = group.append('rect')
-            .attr('x', +event.currentTarget.getAttribute('x'))
-            .attr('y', +event.currentTarget.getAttribute('y'))
-            .attr('width', +event.currentTarget.getAttribute('width'))
-            .attr('height', +event.currentTarget.getAttribute('height'))
-            .attr('fill', 'orange');
-
-        // Add text to the group
-        group.append('text')
+        d3.select(event.currentTarget).attr('fill', '#ff9729');
+        d3.select(event.currentTarget.parentNode)
+            .append('text')
             .attr('class', 'highlighted-text')
-            .attr('x', +currentBar.attr('x') + +currentBar.attr('width') / 2)
-            .attr('y', +currentBar.attr('y') + barHeight / 2)
+            .attr('x', +event.currentTarget.getAttribute('x') + +event.currentTarget.getAttribute('width')/2)
+            .attr('y', +event.currentTarget.getAttribute('y') + +event.currentTarget.getAttribute('height')/2)
             .attr('dy', '.35em')
             .attr('text-anchor', 'middle')
             .attr('fill', 'black')
@@ -120,12 +120,25 @@
     }
 
     function handleBarMouseOut(event, d, key) {
-        // Delay the removal of the group containing the bar and text
-        setTimeout(() => {
-            // Remove the group containing the bar and text
-            svg.selectAll('.bar-group').remove();
-        }, 100); // Adjust the delay time as needed
+        if(key=='ham'){
+            d3.select(event.currentTarget).attr('fill', '#5CA4FF');
+        }else if(key=='sch'){
+            d3.select(event.currentTarget).attr('fill', '#8CC84B');
+        }
+        d3.select(event.currentTarget.parentNode).selectAll('.highlighted-text').remove();
     }
+
+    function handleBarMouseClick(event, d, key) {
+        d3.select('#bar-annotation-2').selectAll('p').remove();
+        d3.select('#bar-annotation-2')
+            .append('p')
+            .style('font-size', '18px')
+            .style('padding', '10px 50px')
+            .style('text-align', 'left')
+            .style('font-weight', '300')
+            .text(stats_annotation[Object.keys(d)[0]]);
+    }
+
     onMount(() => {
         const svgWidth = width * 0.75;
         const svgHeight = height * 0.7;
@@ -301,7 +314,7 @@
 
         const xAxis1 = svg.append('g')
             .attr('class', 'x-axis')
-            .attr('transform', 'translate(0,' + (barHeight + 360) + ')')
+            .attr('transform', 'translate(0,' + (heightPlsChart) + ')')
             .call(d3.axisTop(scaleRight).tickValues([0, 20, 40, 60, 80])
             .tickFormat(d => (d <= 100) ? (d + '%') : null))
             .selectAll('text')  // Select all tick text elements
@@ -319,7 +332,7 @@
 
         const xAxis2 = svg.append('g')
             .attr('class', 'x-axis')
-            .attr('transform', 'translate(0,' + (barHeight + 360) + ')')
+            .attr('transform', 'translate(0,' + (heightPlsChart) + ')')
             .call(d3.axisTop(scaleLeft).tickValues([0, 20, 40, 60, 80])
             .tickFormat(d => (d <= 100) ? (d + '%') : null))
             .selectAll('text')  // Select all tick text elements
@@ -336,6 +349,7 @@
 </script>
 
 <div id="chart-container-2" class:visible={isVisible}></div>
+<div id='bar-annotation-2'><p style='color:white'>Click on any bar to show more information.</p></div>
 
 <style>
      #chart-container-2{

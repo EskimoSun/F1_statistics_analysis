@@ -4,27 +4,35 @@
 
     export let index, width, height;
     const per_dom_stats = [
-        { percentage_points: 'Points', ham: parseFloat((0.756410256 * 100).toFixed(2)), sch: parseFloat((0.822222222 * 100).toFixed(2)) },
-        { percentage_wins: 'Wins', ham: parseFloat((0.523809524 * 100).toFixed(2)), sch: parseFloat((0.722222222 * 100).toFixed(2)) },
-        { percentage_fl: 'Fastest Laps', ham: parseFloat((0.285714286 * 100).toFixed(2)), sch: parseFloat((0.555555556 * 100).toFixed(2)) },
-        { percentage_pod: 'Podiums', ham: parseFloat((0.80952381 * 100).toFixed(2)), sch: parseFloat((0.833333333 * 100).toFixed(2)) },
-        { percentage_poles: 'Poles', ham: parseFloat((0.238095238 * 100).toFixed(2)), sch: parseFloat((0.444444444 * 100).toFixed(2)) }
+        { percentage_points: 'Points', ham: parseFloat((0.785067873 * 100).toFixed(2)), sch: parseFloat((0.822222222 * 100).toFixed(2)) },
+        { percentage_wins: 'Wins', ham: parseFloat((0.647058824 * 100).toFixed(2)), sch: parseFloat((0.722222222 * 100).toFixed(2)) },
+        { percentage_fl: 'Fastest Laps', ham: parseFloat((0.352941176 * 100).toFixed(2)), sch: parseFloat((0.555555556 * 100).toFixed(2)) },
+        { percentage_pod: 'Podiums', ham: parseFloat((0.823529412 * 100).toFixed(2)), sch: parseFloat((0.833333333 * 100).toFixed(2)) },
+        { percentage_poles: 'Poles', ham: parseFloat((0.588235294 * 100).toFixed(2)), sch: parseFloat((0.444444444 * 100).toFixed(2)) }
         ];
 
+    const stats_annotation = {
+        percentage_points: "Both drivers get astonishingly close to earning the maximum amount of points possible, this would require no mishaps from the team strategy, while the driver has to showcase absolutely impeccable driving, and almost perfect performance. However, Schumacher was even more domiant than Hamilton, achieving 2 grand slams, meaning taking pole position, leading every lap of the race, finishing first place, while holding the fastest lap record. ",
+        percentage_wins: "Even though the difference in win rates between the drivers seem huge, Hamilton had only missed one additional win in comparison to Schumacher, with Schumacher missing 5 race wins, and Hamilton missing 6. One of the misses is even due to Hamilton's suboptimal health condition for catching COVID-19. However, the Ferrari driver was able to achieve a win streak of 7, while the Mercedes driver could only achieve 5. ",
+        percentage_fl: "One reason that Hamilton consistently had fewer fastest laps than Schumacher might have been due to the strategy employed by Mercedes. Most of the time, in order to get the fastest lap of the race, a driver would need to swap on new soft rubber, but that would also sacrafice overall race time as it requires an additional pitstop. The tyre characteristics at Schumacher's time was different, and didn't have as much degredation as current tyres, so he wouldn't have needed to stop for new ones before going for the fastest lap. ",
+        percentage_pod: "Both their number of podiums were extremely close, meaning that they were likely equally as consistent, driving similarly dominant and reliable machines, hurling around the tracks. It is quite hard to tell which driver-team combo achieved better results simply by looking at these close figures.",
+        percentage_poles: "One reason why Schumacher didn't manage to get as high of a pole percentage as Hamilton is due to strategy choices. Ferrari at the time believed that sometimes by trading pole position, drivers could achieve a better start to the race and are set up for better overtakes. ",
+    }
+
     const dom_stats = [
-        { points: 'Points Count', ham: 413, sch: 148 },
+        { points: 'Points Count', ham: 347, sch: 148 },
         { wins: 'Wins Count', ham: 11, sch: 13 },
         { fl: 'Fastest Laps Count', ham: 6, sch: 10 },
-        { pod: 'Podiums Count', ham: 17, sch: 15 },
-        { poles: 'Poles Count', ham: 5, sch: 8 }
+        { pod: 'Podiums Count', ham: 14, sch: 15 },
+        { poles: 'Poles Count', ham: 10, sch: 8 }
     ];
 
     const total_dom_stats = [
-        { total_point: 'Maximum Points', ham: 546, sch: 180 },
-        { total_race: 'Total Races', ham: 21, sch: 18 },
-        { total_race: 'Total Races', ham: 21, sch: 18 },
-        { total_race: 'Total Races', ham: 21, sch: 18 },
-        { total_race: 'Total Races', ham: 21, sch: 18 }
+        { total_point: 'Maximum Points', ham: 442, sch: 180 },
+        { total_race: 'Total Races', ham: 17, sch: 18 },
+        { total_race: 'Total Races', ham: 17, sch: 18 },
+        { total_race: 'Total Races', ham: 17, sch: 18 },
+        { total_race: 'Total Races', ham: 17, sch: 18 }
     ];
 
     let container;
@@ -37,7 +45,7 @@
     let xScale;
     const barHeight =35;
 
-    $:if(index == 3){
+    $:if(index == 4){
         isVisible = true;
         if (allInitialized){
             toggleVisibility(isVisible);
@@ -65,7 +73,8 @@
                 .on('end', function () { // Once the transition is complete, attach event listeners
                     d3.select(this)
                         .on('mouseover', (event, d) => handleBarMouseOver(event, d, 'ham'))
-                        .on('mouseout', (event, d) => handleBarMouseOut(event, d, 'ham'));
+                        .on('mouseout', (event, d) => handleBarMouseOut(event, d, 'ham'))
+                        .on('click', (event, d) => handleBarMouseClick(event, d, 'ham'));
                 });
 
             bar2.transition()
@@ -75,7 +84,8 @@
                 .on('end', function () { // Once the transition is complete, attach event listeners
                     d3.select(this)
                         .on('mouseover', (event, d) => handleBarMouseOver(event, d, 'sch'))
-                        .on('mouseout', (event, d) => handleBarMouseOut(event, d, 'sch'));
+                        .on('mouseout', (event, d) => handleBarMouseOut(event, d, 'sch'))
+                        .on('click', (event, d) => handleBarMouseClick(event, d, 'sch'));
                 });
         } else {
             // Animate back to width 0
@@ -83,7 +93,7 @@
                 .duration(1000) // Duration of the transition
                 .attr('width', 0)
                 .on('end', function () { // Once the transition is complete, remove event listeners
-                    d3.select(this).on('mouseover', null).on('mouseout', null);
+                    d3.select(this).on('mouseover', null).on('mouseout', null).on('click', null);
                 });
 
             bar2.transition()
@@ -91,29 +101,19 @@
                 .attr('x', xScale(0) - 70) // Move bar2 back to the center
                 .attr('width', 0)
                 .on('end', function () { // Once the transition is complete, remove event listeners
-                    d3.select(this).on('mouseover', null).on('mouseout', null);
+                    d3.select(this).on('mouseover', null).on('mouseout', null).on('click', null);
                 });
         }
 
     }
 
     function handleBarMouseOver(event, d, key) {
-        // Create a group for the bar and text
-        const group = svg.append('g').attr('class', 'bar-group');
-
-        // Highlight the hovered bar
-        const currentBar = group.append('rect')
-            .attr('x', +event.currentTarget.getAttribute('x'))
-            .attr('y', +event.currentTarget.getAttribute('y'))
-            .attr('width', +event.currentTarget.getAttribute('width'))
-            .attr('height', +event.currentTarget.getAttribute('height'))
-            .attr('fill', 'orange');
-
-        // Add text to the group
-        group.append('text')
+        d3.select(event.currentTarget).attr('fill', '#ff9729');
+        d3.select(event.currentTarget.parentNode)
+            .append('text')
             .attr('class', 'highlighted-text')
-            .attr('x', +currentBar.attr('x') + +currentBar.attr('width') / 2)
-            .attr('y', +currentBar.attr('y') + barHeight / 2)
+            .attr('x', +event.currentTarget.getAttribute('x') + +event.currentTarget.getAttribute('width')/2)
+            .attr('y', +event.currentTarget.getAttribute('y') + +event.currentTarget.getAttribute('height')/2)
             .attr('dy', '.35em')
             .attr('text-anchor', 'middle')
             .attr('fill', 'black')
@@ -121,11 +121,23 @@
     }
 
     function handleBarMouseOut(event, d, key) {
-        // Delay the removal of the group containing the bar and text
-        setTimeout(() => {
-            // Remove the group containing the bar and text
-            svg.selectAll('.bar-group').remove();
-        }, 100); // Adjust the delay time as needed
+        if(key=='ham'){
+            d3.select(event.currentTarget).attr('fill', '#5CA4FF');
+        }else if(key=='sch'){
+            d3.select(event.currentTarget).attr('fill', '#8CC84B');
+        }
+        d3.select(event.currentTarget.parentNode).selectAll('.highlighted-text').remove();
+    }
+
+    function handleBarMouseClick(event, d, key) {
+        d3.select('#bar-annotation-3').selectAll('p').remove();
+        d3.select('#bar-annotation-3')
+            .append('p')
+            .style('font-size', '18px')
+            .style('padding', '10px 50px')
+            .style('text-align', 'left')
+            .style('font-weight', '300')
+            .text(stats_annotation[Object.keys(d)[0]]);
     }
 
     onMount(() => {
@@ -303,7 +315,7 @@
 
         const xAxis1 = svg.append('g')
             .attr('class', 'x-axis')
-            .attr('transform', 'translate(0,' + (barHeight + 360) + ')')
+            .attr('transform', 'translate(0,' + (heightPlsChart) + ')')
             .call(d3.axisTop(scaleRight).tickValues([0, 20, 40, 60, 80])
             .tickFormat(d => (d <= 100) ? (d + '%') : null))
             .selectAll('text')  // Select all tick text elements
@@ -321,7 +333,7 @@
 
         const xAxis2 = svg.append('g')
             .attr('class', 'x-axis')
-            .attr('transform', 'translate(0,' + (barHeight + 360) + ')')
+            .attr('transform', 'translate(0,' + (heightPlsChart) + ')')
             .call(d3.axisTop(scaleLeft).tickValues([0, 20, 40, 60, 80])
             .tickFormat(d => (d <= 100) ? (d + '%') : null))
             .selectAll('text')  // Select all tick text elements
@@ -338,6 +350,7 @@
 </script>
 
 <div id="chart-container-3" class:visible={isVisible}></div>
+<div id='bar-annotation-3'><p style='color:white'>Click on any bar to show more information.</p></div>
 
 <style>
     #chart-container-3{

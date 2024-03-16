@@ -1,8 +1,6 @@
 <script>
     import * as d3 from 'd3';
     import { onMount } from 'svelte';
-    import { fly, draw } from "svelte/transition";
-    import { cubicOut, cubicInOut } from "svelte/easing";
 
     export let index, width, height;
 
@@ -14,6 +12,14 @@
         { percentage_pod: 'Podiums', ham: parseFloat((0.591591592 * 100).toFixed(2)), sch: parseFloat((0.506535948 * 100).toFixed(2)) },
         { percentage_poles: 'Poles', ham: parseFloat((0.312312312 * 100).toFixed(2)), sch: parseFloat((0.222222222 * 100).toFixed(2)) }
     ];
+
+    const stats_annotation = {
+        percentage_points: 'The difference in the maximum points for the two drivers is due to the different number of races they have participated in, and also because of changes in the points scoring system. The points shown above are the actual points they obtained through different scoring systems. If all of their race results were calculated using the most recent scoring metrics, then Schumacher would earn 3961 out of 7956 possible points (49.79%), averaging 12.94 points per race, and Hamilton would earn 5047.5 out of 8754 possible points (57.66%), averaging 15 points per race.',
+        percentage_wins: 'The win percentage between the two drivers are extremely close. But because Hamilton is still a current driver, his percentage win would decrease with more participating races. By the end of 2024 season, he would have a lower win rate than Schumacher, assuming he would not get another race win. ',
+        percentage_fl: "The amount of fastest laps reflects a driver's consistently fast race pace throughout his career. Schumacher holds the most amount of fastest laps records among all F1 drivers, meaning that he was able to out perform all other drivers on the grid at each grand prix. ",
+        percentage_pod: "If a driver consistently finished on the podium, this often implied that the car was reliable during the race, and the team's race car is quite competitive, standing in a position ready to take victories. In a way, the amount of podiums also shows how dominant a driver or team is in that season. Both drivers finished on the podium in MORE THAN HALF of the races through their career. ",
+        percentage_poles: "The amount of poles could reflect a driver's one-lap pace. But if we were to look at the pole to win ratio (poles/wins), we see that Schumacher has a ratio of 0.75 meaning that more than 1/4 th of Schumacher's wins comes from him overtaking in the race and not purely relying on the pace of the car.  While Hamilton has a ratio of 1.01, meaning that a large majority of the wins (if not close to all), comes from his pole position starts, meaning that his wins might have relied more on the pace of the car. "
+    }
 
     const career_stats = [
         { points: '#Points', ham: 4646, sch: 1566 },
@@ -42,7 +48,7 @@
     let xScale;
 
     
-    $:if(index == 1){
+    $:if(index == 2){
         isVisible = true;
         if (allInitialized){
             toggleVisibility(isVisible);
@@ -70,7 +76,8 @@
                 .on('end', function () { // Once the transition is complete, attach event listeners
                     d3.select(this)
                         .on('mouseover', (event, d) => handleBarMouseOver(event, d, 'ham'))
-                        .on('mouseout', (event, d) => handleBarMouseOut(event, d, 'ham'));
+                        .on('mouseout', (event, d) => handleBarMouseOut(event, d, 'ham'))
+                        .on('click', (event, d) => handleBarMouseClick(event, d, 'ham'));
                 });
 
             bar2.transition()
@@ -80,7 +87,8 @@
                 .on('end', function () { // Once the transition is complete, attach event listeners
                     d3.select(this)
                         .on('mouseover', (event, d) => handleBarMouseOver(event, d, 'sch'))
-                        .on('mouseout', (event, d) => handleBarMouseOut(event, d, 'sch'));
+                        .on('mouseout', (event, d) => handleBarMouseOut(event, d, 'sch'))
+                        .on('click', (event, d) => handleBarMouseClick(event, d, 'sch'));
                 });
         } else {
             // Animate back to width 0
@@ -88,7 +96,7 @@
                 .duration(1000) // Duration of the transition
                 .attr('width', 0)
                 .on('end', function () { // Once the transition is complete, remove event listeners
-                    d3.select(this).on('mouseover', null).on('mouseout', null);
+                    d3.select(this).on('mouseover', null).on('mouseout', null).on('click', null);
                 });
 
             bar2.transition()
@@ -96,28 +104,18 @@
                 .attr('x', xScale(0) - 70) // Move bar2 back to the center
                 .attr('width', 0)
                 .on('end', function () { // Once the transition is complete, remove event listeners
-                    d3.select(this).on('mouseover', null).on('mouseout', null);
+                    d3.select(this).on('mouseover', null).on('mouseout', null).on('click', null);
                 });
         }
     }
 
     function handleBarMouseOver(event, d, key) {
-        // Create a group for the bar and text
-        const group = svg.append('g').attr('class', 'bar-group');
-
-        // Highlight the hovered bar
-        const currentBar = group.append('rect')
-            .attr('x', +event.currentTarget.getAttribute('x'))
-            .attr('y', +event.currentTarget.getAttribute('y'))
-            .attr('width', +event.currentTarget.getAttribute('width'))
-            .attr('height', +event.currentTarget.getAttribute('height'))
-            .attr('fill', '#ff9729');
-
-        // Add text to the group
-        group.append('text')
+        d3.select(event.currentTarget).attr('fill', '#ff9729');
+        d3.select(event.currentTarget.parentNode)
+            .append('text')
             .attr('class', 'highlighted-text')
-            .attr('x', +currentBar.attr('x') + +currentBar.attr('width') / 2)
-            .attr('y', +currentBar.attr('y') + barHeight / 2)
+            .attr('x', +event.currentTarget.getAttribute('x') + +event.currentTarget.getAttribute('width')/2)
+            .attr('y', +event.currentTarget.getAttribute('y') + +event.currentTarget.getAttribute('height')/2)
             .attr('dy', '.35em')
             .attr('text-anchor', 'middle')
             .attr('fill', 'black')
@@ -125,11 +123,23 @@
     }
 
     function handleBarMouseOut(event, d, key) {
-        // Delay the removal of the group containing the bar and text
-        setTimeout(() => {
-            // Remove the group containing the bar and text
-            svg.selectAll('.bar-group').remove();
-        }, 100); // Adjust the delay time as needed
+        if(key=='ham'){
+            d3.select(event.currentTarget).attr('fill', '#5CA4FF');
+        }else if(key=='sch'){
+            d3.select(event.currentTarget).attr('fill', '#8CC84B');
+        }
+        d3.select(event.currentTarget.parentNode).selectAll('.highlighted-text').remove();
+    }
+
+    function handleBarMouseClick(event, d, key) {
+        d3.select('#bar-annotation-1').selectAll('p').remove();
+        d3.select('#bar-annotation-1')
+            .append('p')
+            .style('font-size', '18px')
+            .style('padding', '10px 50px')
+            .style('text-align', 'left')
+            .style('font-weight', '300')
+            .text(stats_annotation[Object.keys(d)[0]]);
     }
 
     onMount(() => {
@@ -252,9 +262,7 @@
             .attr('y', d => yScale(Object.keys(d)[0]))
             .attr('width', 0)
             .attr('height', barHeight)
-            .attr('fill', '#8CC84B')
-            .on('mouseover', (event, d, i) => handleBarMouseOver(event, d, 'sch'))
-            .on('mouseout', (event, d, i) => handleBarMouseOut(event, d, 'sch'));
+            .attr('fill', '#8CC84B');
         
 
         // Add labels for bar2
@@ -311,7 +319,7 @@
 
         const xAxis1 = svg.append('g')
             .attr('class', 'x-axis')
-            .attr('transform', 'translate(0,' + (barHeight + 360) + ')')
+            .attr('transform', 'translate(0,' + (heightPlsChart) + ')')
             .call(d3.axisTop(scaleRight).tickValues([0, 20, 40, 60, 80])
             .tickFormat(d => (d <= 100) ? (d + '%') : null))
             .selectAll('text')  // Select all tick text elements
@@ -329,7 +337,7 @@
 
         const xAxis2 = svg.append('g')
             .attr('class', 'x-axis')
-            .attr('transform', 'translate(0,' + (barHeight + 360) + ')')
+            .attr('transform', 'translate(0,' + (heightPlsChart) + ')')
             .call(d3.axisTop(scaleLeft).tickValues([0, 20, 40, 60, 80])
             .tickFormat(d => (d <= 100) ? (d + '%') : null))
             .selectAll('text')  // Select all tick text elements
@@ -346,6 +354,7 @@
 </script>
 
 <div id="chart-container-1" class:visible={isVisible}></div>
+<div id='bar-annotation-1'><p style='color:white'>Click on any bar to show more information.</p></div>
 
 <style>
     #chart-container-1{
